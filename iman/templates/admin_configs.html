@@ -1,0 +1,72 @@
+{% extends "admin.html" %}
+{% set snactive = "configs" %}
+
+{% block title %}IMan Administration - Sites{% endblock %}
+
+{% block content %}
+<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+  <li class="active">
+    <a data-toggle="tab" href="#sites"><i class="fa fa-code fa-fw"></i>Variables</a>
+  </li>
+</ul>
+<div class="tab-content">
+  <div id="configs" class="tab-pane fade in active">
+    <div id="toolbar-config">
+      <a id="new-config" href="#" class="btn btn-primary">
+	<i class="fa fa-plus"> Add</i>
+      </a>
+    </div>
+    <table id="table-configs" data-show-toggle="false" data-show-export="true"
+	   data-show-columns="true" data-show-multi-sort="true" data-sort-name="display"
+	   data-toggle="table" data-search="true" data-toolbar="#toolbar-config"
+	   data-pagination="true"
+	   data-show-footer="false" data-page-size="50" data-escape="false"
+	   class="table table-hover table-striped table-compact table-condensed">
+      <thead>
+	<tr>
+	  <th data-sortable="true" data-halign="left" data-valign="middle" data-field="id" data-visible="false">
+	    ID
+	  </th>
+	  <th data-sortable="true" data-halign="left" data-valign="middle" data-field="key">
+	    Key
+	  </th>
+	  <th data-sortable="false" data-halign="left" data-valign="middle">
+	    Value
+	  </th>
+      </thead>
+      <tbody>
+	{% for cfg in data('Config') %}
+	<tr>
+	  <td>{{ cfg.id }}</td>
+	  <td>{{ cfg.key }}</td>
+	  <td>{{ cfg.value }}</td>
+	</tr>
+	{% endfor %}      
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link href="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.css" rel="stylesheet">
+<script src="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.js"></script>
+<script>
+    $(document).ready(function () {
+	$(".table").bootstrapTable({
+	    height: table_height(),
+	});
+	$(".table").bootstrapTable('resetView', {
+    	    height: table_height(),
+	});
+	$(window).resize(function () {
+	    $(".table").bootstrapTable('resetView', {
+    		height: table_height(),
+	    });
+	});
+    });
+function table_height() {
+    return $(".tab-pane").height();
+};
+</script>
+{% endblock %}

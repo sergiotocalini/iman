@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}IMan - Dashboard{% endblock %}
+
+{% block body %}
+<div id="dashboard">
+  <h1 class="title">Dashboard</h1>
+  <div class="graphs container">
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-8">
+	<div id="graph-sites"></div>
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-4">
+	<div id="graph-support"></div>
+      </div>
+      <div class="col-md-4">
+	<div id="graph-types"></div>
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="//cdn.corpam.com.ar/c3/stable/c3.min.js"></script>
+<script src="//cdn.corpam.com.ar/d3/stable/d3.min.js" charset="utf-8"></script>
+<link href="//cdn.corpam.com.ar/c3/stable/c3.min.css" rel="stylesheet" type="text/css">
+<script>
+  $(function () {
+    $(document).ready(function () {
+  
+      var chart_support = c3.generate({
+        bindto: '#graph-support',
+        data: {
+          columns: [
+            {% for i in supported() %}
+            ['{{ i[0] }}', {{ i[1] }}],
+            {% endfor %}
+          ],
+          type : 'donut',
+        },
+        legend: {
+          position: 'bottom',
+        },
+        donut: {
+          title: 'Expiration',
+        }
+      });
+
+      var chart_types = c3.generate({
+        bindto: '#graph-types',
+        data: {
+          columns: [
+            {% for i in data('Category') %}
+            [ '{{ i.name }}', {{ i.products.items.__len__() }} ],
+            {% endfor %}
+          ],
+          type : 'donut',
+        },
+        legend: {
+          position: 'bottom',
+        },
+        donut: {
+          title: 'Types',
+        }
+      });
+  
+      var chart_sites = c3.generate({
+        bindto: '#graph-sites',
+        data: {
+          columns: [
+            {% for i in data('Site') %}
+            ['{{ i.name }}', {{ i.centers.items.__len__() }}],
+            {% endfor %}
+          ],
+          type : 'donut',
+        },
+        legend: {
+          position: 'inset',
+          inset: {
+             anchor: 'top-right',
+          },
+        },
+        donut: {
+          title: 'Sites',
+        },
+      });
+    });
+  });
+</script>
+{% endblock %}

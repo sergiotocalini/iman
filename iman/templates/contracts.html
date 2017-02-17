@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% set highlighted = "agreements" %}
+
+{% block title %}IMan - Contract {{ serial }}{% endblock %}
+
+{% block body %}
+<div class="agree-content center-block">
+  <form role="form" method="POST" action="{{ url_for('contracts', serial=serial) }}" style="width: 40%;">
+    {{ form.csrf_token }}
+    <fieldset id="fieldset">
+      <div class="form-group">
+	{{ form.serial.label }}
+	<div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="fa fa-fw fa-key"></i>
+	    </span>
+	  {{ form.serial(class="form-control",required=True,placeholder="Serial") }}
+	</div>
+      </div>
+      <div class="row">
+	<div class="col-md-6 form-group">
+	  {{ form.price.label }}
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="fa fa-fw fa-money"></i>
+	    </span>
+	    {{ form.price(class="form-control", required=True) }}
+	  </div>
+	</div>
+	<div class="col-md-6 form-group">
+	  {{ form.vendor.label }}
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	      <i class="fa fa-fw fa-shield"></i>
+	    </span>
+	    {{ form.vendor(class="form-control") }}
+	  </div>
+	</div>
+      </div>
+      <div class="row">
+	<div class="col-md-6 form-group">
+	  {{ form.start.label }}
+	  <div class="input-group date" id="datepicker-start">
+	    <span class="input-group-addon">
+	      <i class="fa fa-fw fa-calendar"></i>
+	    </span>
+	    {{ form.start(class="form-control") }}
+	  </div>
+	</div>
+	<div class="col-md-6 form-group">
+	  {{ form.end.label }}
+	  <div class="input-group date" id="datepicker-end">
+	    <span class="input-group-addon">
+	      <i class="fa fa-fw fa-calendar"></i>
+	    </span>
+	    {{ form.end(class="form-control") }}
+	  </div>
+	</div>
+      </div>
+      <div class="form-group">
+	<div class="input-group">
+	  {{ form.notes.label }}
+	  {{ form.notes(class="form-control", placeholder="Notes", rows="7")|safe }}
+	</div>
+      </div>
+      {% if session.user.admin %}
+      <div class="clearfix pull-right">
+	{{ form.save(class="btn btn-primary") }}
+	{{ form.savenn(class="btn btn-secondary") }}
+      </div>
+      {% endif %}
+    </fieldset>
+  </form>
+  <div id="table-content" style="width: 60%;">
+    <div id="toolbar-contracts">
+      {% if session.user.admin %}
+      <button class="btn btn-primary btn-sm dropdown-toggle"
+	      type="button" data-toggle="dropdown"
+	      aria-haspopup="true" aria-expanded="false">
+	<i class="fa fa-cogs fa-fw"></i>
+      </button>
+      <ul class="dropdown-menu">
+	<li>
+	  <a class="items-add" href="#" data-toggle="modal"
+	     data-target="#ModalItems">
+	    <i class="fa fa-fw fa-plus"></i>
+	    Add
+	  </a>
+	</li>
+	<li>
+	  <a class="items-del" href="#">
+	    <i class="fa fa-fw fa-minus"></i>
+	    Del
+	  </a>
+	</li>
+      </ul>
+      {% endif %}
+    </div>
+    <table id="table-contracts" data-show-toggle="true"
+	   data-toggle="table" data-pagination="true"
+	   data-page-size="25" data-show-footer="false"
+	   data-search="true" data-escape="false"
+	   data-sort-name="serial"
+	   data-toolbar="#toolbar-contracts"
+	   class="table table-hover table-striped table-compact
+		  table-condensed table-autosize">
+      <thead>
+	<tr>
+	  <th data-checkbox="true"></th>
+	  <th data-field="serial">Item</th>
+	  <th data-field="product">Product</th>
+	</tr>
+      </thead>
+      <tbody>
+	{% for items in data('Agreement', serial=serial).items %}
+	<tr>
+	  <td></td>
+	  <td>{{ items.serial }}</td>
+	  <td>{{ items.product.serial }}</td>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<div id="ModalItems" class="modal in" tabindex="-1"
+     role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-content" style="width: 70%;">
+    <div class="modal-header"
+	 style="background-color: #337ab7; color: #fff;">
+      <button type="button" class="close"
+	      data-dismiss="modal" aria-hidden="true">
+	&times;
+      </button>
+      <h4 class="modal-title">New</h4>
+    </div>
+    <div class="modal-body">
+      <table id="table-items-search" data-show-refresh="true"
+	     data-show-toggle="false" data-show-export="false"
+	     data-show-columns="true" data-show-multi-sort="true"
+	     data-sort-name="display" data-pagination="true"
+	     data-toggle="table" data-search="true"
+	     data-show-footer="false" data-page-size="50"
+	     data-escape="false" data-ajax="items_search"
+	     class="table table-hover table-striped table-compact
+		    table-condensed table-autosize">
+	<thead>
+	  <tr>
+	    <th data-field="serial">
+	      <i class="fa fa-fw fa-sort-amount-desc"></i>
+	      Serial
+	    </th>
+	    <th data-field="site">
+	      <i class="fa fa-fw fa-envelope"></i>
+	      Site
+	    </th>
+	    <th data-field="product">
+	      <i class="fa fa-fw fa-envelope"></i>
+	      Product
+	    </th>
+	    <th data-field="actions" data-align="center"
+		data-formatter="FormatItemActions">
+	      <i class="fa fa-fw fa-cogs"></i>
+	      Actions
+	    </th>
+	  </tr>
+	</thead>
+	<tbody>
+	</tbody>
+      </table>
+    </div>
+    <div class="modal-footer"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link href="//cdn.corpam.com.ar/bootstrap-datepicker/stable/css/bootstrap-datepicker.min.css" rel="stylesheet">
+<link href="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.css" rel="stylesheet">
+<script src="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.js"></script>
+<script src="//cdn.corpam.com.ar/bootstrap-datepicker/stable/js/bootstrap-datepicker.min.js"></script>
+<script>
+    $(document).ready(function () {
+	autosize_tables();
+	$(window).resize(function () {
+	    autosize_tables();
+	});
+	$('.modal').on('shown.bs.modal', function(e){
+	    autosize_tables();
+	});
+	$('.modal').on('hidden.bs.modal', function(){
+	    $('.modal').find('.modal-title').html('New');
+	    var forms = $(this).find('form');
+	    forms.each(function(row){
+		forms[row].reset();
+	    });
+	    var selectpickers = $(this).find('.selectpicker');
+	    selectpickers.each(function(row){
+		$(selectpickers[row]).selectpicker('refresh');
+	    });
+	});
+	jqlisteners();
+    });
+
+$(function () {
+	// $("#table-contracts").bootstrapTable({
+	//     height: table_height()
+	// });
+	var startDate = new Date('01/01/2012');
+	var FromEndDate = new Date();
+	var ToEndDate = new Date();
+	$("#datepicker-start").datepicker({
+	    format: 'yyyy-mm-dd',
+	    autoclose: true,
+	    orientation: "bottom",
+	    todayBtn: true,
+	    todayHighlight: true,
+	    endDate: FromEndDate,
+	})
+	    .on('changeDate', function(selected){
+		startDate = new Date(selected.date.valueOf());
+		startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+		$('#datepicker-end').datepicker('setStartDate', startDate);
+	    });
+	$("#datepicker-end").datepicker({
+	    format: 'yyyy-mm-dd',
+	    autoclose: true,
+	    orientation: "bottom",
+	    todayBtn: true,
+	    todayHighlight: true,
+	    startDate: startDate,
+	})
+	    .on('changeDate', function(selected){
+		FromEndDate = new Date(selected.date.valueOf());
+		FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+		$('#datepicker-start').datepicker('setEndDate', FromEndDate);
+	    });
+    });
+function jqlisteners() {
+    $(".contract-add-item").unbind();
+    $(".contract-add-item").click(function(e) {
+	var serial = $(this).data('id');
+	var url = "{{ url_for('api', obj='Item') }}?serial="+serial;
+	var tablec = '#table-contracts';
+	var data = { 'agreements':
+  		     {'action': 'add', 'serial': "{{ serial }}" }
+	};
+	$.ajax({
+	    async: false,
+	    url: url,
+	    type: 'POST',
+	    data: JSON.stringify(data),
+	    contentType: "application/json",
+	    success: function(result) {
+		$(tablec).bootstrapTable('append', {
+		    'serial': serial,
+		});
+	    }
+	});
+    });
+};	
+function items_search() {
+    var table = '#table-items-search';
+    $(table).bootstrapTable('showLoading');
+    $(table).bootstrapTable('removeAll');
+    $.ajax({
+	async: true,
+	url: "{{ url_for('api_items') }}",
+	type: 'GET',
+	success: function(e) {
+	    for(i in e['data']) {
+		var item = e['data'][i];
+		$(table).bootstrapTable('append', {
+		    'serial': item['serial'],
+		    'site': item['site'],
+		    'product': item['product'],
+		    'actions': '',
+		});
+
+	    };
+	    $(table).bootstrapTable('hideLoading');
+	}
+    });
+    return false;
+};
+function autosize_tables() {
+    var tables = $('body').find(".table-autosize");
+    tables.each(function(row){
+	var selector = $(tables[row]).attr('id');
+	selector = '#' + selector;
+	$(selector).on('post-body.bs.table', function () {
+	    jqlisteners();
+	});
+	$(selector).bootstrapTable({
+	    height: table_height(selector),
+	});
+	$(selector).bootstrapTable('resetView', {
+	    height: table_height(selector),
+	});	    
+    });
+}
+function table_height(table) {
+    var parent = $(table).parent().parent().parent().parent();
+    return parent.height();
+};
+function FormatItemActions(value, row, index) {
+    html = '<a class="contract-add-item" data-id="';
+    html+= row['serial'] + '">';
+    html+= '<i class="fa fa-fw fa-plus"></i>';
+    html+= '</a>';
+    return html;
+}
+</script>
+{% endblock %}

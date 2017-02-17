@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}IMan - Dashboard{% endblock %}
+
+{% block body %}
+<div id="profile">
+  <img class="img-circle" src="{{ session.user.avatar }}"/>
+  <span class="divider-horz"></span>
+  <table class="grid" cellspacing="1" cellpadding="1">
+    <tbody>
+      <tr>
+	<td><strong>First Name</strong></td>
+	<td>{{ session.user.firstname }}</td>
+      </tr>
+      <tr>
+	<td><strong>Last Name</strong></td>
+	<td>{{ session.user.lastname }}</td>
+      </tr>
+      <tr>
+	<td><strong>Email</strong></td>
+	<td>{{ session.user.email }}</td>
+      </tr>
+      <tr>
+	<td><strong>Gender</strong></td>
+	<td>{{ session.user.gender }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

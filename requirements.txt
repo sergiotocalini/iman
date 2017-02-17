@@ -1,0 +1,9 @@
+pymysql
+wtforms
+pony
+arrow
+flask
+werkzeug
+gunicorn
+pony
+requests

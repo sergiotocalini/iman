@@ -1,0 +1,203 @@
+{% extends "admin.html" %}
+{% set snactive = "users" %}
+
+{% block title %}IMan Administration - Users{% endblock %}
+
+{% block content %}
+<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+  <li class="active">
+    <a data-toggle="tab" href="#users"><i class="fa fa-user fa-fw"></i>Users</a>
+  </li>
+  <li>
+    <a data-toggle="tab" href="#groups"><i class="fa fa-group fa-fw"></i>Groups</a>
+  </li>
+</ul>
+<div class="tab-content">
+  <div id="users" class="tab-pane fade in active">
+    <table id="table-users" data-show-toggle="false"
+	   data-show-export="false"
+	   data-show-columns="true" data-show-multi-sort="true"
+	   data-sort-name="display" data-pagination="true"
+	   data-toggle="table" data-search="true" data-toolbar="#toolbar"
+	   data-show-footer="false" data-page-size="50" data-escape="false"
+	   class="table table-hover table-striped table-compact table-condensed">
+      <thead>
+	<tr>
+	  <th data-sortable="true" data-halign="center" data-valign="middle" data-field="userid" data-visible="false">
+	    ID
+	  </th>
+	  <th data-sortable="true" data-halign="center" data-valign="middle" data-field="display" data-sorter="nameSort">
+	    Display Name
+	  </th>
+	  <th data-halign="center" data-valign="middle" data-field="email">
+	    Email
+	  </th>
+	  <th data-sortable="true" data-valign="middle" data-align="center">
+	    Admin
+	  </th>
+	  <th data-sortable="true" data-valign="middle" data-align="center">
+	    Status
+	  </th>	
+      </thead>
+      <tbody>
+	{% for user in data('User') %}
+	<tr>
+	  <td>{{ user.userid }}</td>
+	  <td>
+	    <img class="img-circle fa-fw" src="{{ user.avatar }}" alt="">
+	    {{ user.displayname }}
+	  </img>
+	  </td>
+	  <td>{{ user.email }}</td>
+	  <td>
+	    <a href="#" class="user-admin" data-userid="{{ user.userid }}">
+	      {% if user.admin %}
+	      <i class="fa fa-fw fa-check"></i>
+	      {% else %}
+	      <i class="fa fa-fw fa-ban"></i>
+	      {% endif %}
+	    </a>
+	  </td>
+	  <td>
+	    <a href="#" class="user-status" data-userid="{{ user.userid }}">
+	      {% if user.status %}
+	      <i class="fa fa-fw fa-check"></i>
+	      {% else %}
+	      <i class="fa fa-fw fa-ban"></i>
+	      {% endif %}
+	    </a>
+	  </td>
+	</tr>
+	{% endfor %}      
+      </tbody>
+    </table>
+  </div>
+
+  <div id="groups" class="tab-pane fade in">
+    <table id="table-groups" data-show-toggle="false"
+	   data-show-export="false"
+	   data-show-columns="true" data-show-multi-sort="true"
+	   data-sort-name="display" data-pagination="true"
+	   data-toggle="table" data-search="true" data-toolbar="#toolbar"
+	   data-show-footer="false" data-page-size="50" data-escape="false"
+	   class="table table-hover table-striped table-compact table-condensed">
+      <thead>
+	<tr>
+	  <th data-sortable="true" data-halign="left" data-valign="middle" data-field="id" data-visible="false">
+	    ID
+	  </th>
+	  <th data-sortable="true" data-halign="left" data-valign="middle" data-field="name">
+	    Name
+	  </th>
+	  <th data-halign="left" data-valign="middle" data-field="Gecos">
+	    Gecos
+	  </th>
+	  <th data-sortable="true" data-valign="middle" data-align="center">
+	    Users
+	  </th>
+      </thead>
+      <tbody>
+	{% for group in data('Group') %}
+	<tr>
+	  <td>{{ group.id }}</td>
+	  <td>{{ group.name }}</td>
+	  <td>{{ group.gecos }}</td>
+	  <td>{{ group.users.count() }}</td>
+	</tr>
+	{% endfor %}      
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link href="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.css" rel="stylesheet">
+<script src="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.js"></script>
+<script>
+    $(document).ready(function () {
+	$(".table").bootstrapTable({
+	    height: table_height(),
+	    exportTypes: ['json', 'csv', 'txt', 'excel']
+	});
+	$(".table").bootstrapTable('resetView', {
+	    height: table_height(),
+	});
+	$(window).resize(function () {
+	    $(".table").bootstrapTable('resetView', {
+		height: table_height(),
+	    });
+	});
+	$(".user-admin").click(function(){
+    	    var i_tag = $(this).find('i');
+	    if ( ! i_tag.hasClass("fa-spinner") ) {
+		var userid = $(this).data('userid');
+		var url = "{{ url_for('api', obj='User') }}?userid=" + userid;
+		if (i_tag.hasClass('fa-check')) {
+		    var active = false;
+		    i_tag.removeClass('fa-check');
+		    i_tag.addClass('fa-spinner fa-pulse');
+		} else {
+		    var active = true;
+		    i_tag.removeClass('fa-ban');
+		    i_tag.addClass('fa-spinner fa-pulse');
+		};
+		$.ajax({
+		    async: true,
+		    url: url,
+		    type: 'POST',
+		    data: JSON.stringify({'admin': active}),
+		    contentType: "application/json",
+		    success: function(e) {
+			i_tag.removeClass('fa-spinner fa-pulse');
+			if (active == true) {
+			    i_tag.addClass('fa-check');
+			} else {
+			    i_tag.addClass('fa-ban');	    
+			};
+		    }
+		});
+	    };
+	});
+	$(".user-status").click(function(){
+	    var i_tag = $(this).find('i');
+	    if ( ! i_tag.hasClass("fa-spinner") ) {
+		var userid = $(this).data('userid');
+		var url = "{{ url_for('api', obj='User') }}?userid=" + userid;
+		if ( i_tag.hasClass('fa-check') ) {
+		    var active = false;
+		    i_tag.removeClass('fa-check');
+		    i_tag.addClass('fa-spinner fa-pulse');
+		} else {
+		    var active = true;
+		    i_tag.removeClass('fa-ban');
+		    i_tag.addClass('fa-spinner fa-pulse');
+		};
+		$.ajax({
+		    async: true,
+		    url: url,
+		    type: 'POST',
+		    data: JSON.stringify({'status': active}),
+		    contentType: "application/json",
+		    success: function(e) {
+			i_tag.removeClass('fa-spinner fa-pulse');
+			if (active == true) {
+			    i_tag.addClass('fa-check');
+			} else {
+			    i_tag.addClass('fa-ban');    
+			};
+		    }
+		});
+	    }
+	});
+    });
+function table_height() {
+    return $(".tab-pane").height();
+};
+function nameSort(a, b) {
+    console.log(a, b);
+    return 0;
+}
+</script>
+{% endblock %}

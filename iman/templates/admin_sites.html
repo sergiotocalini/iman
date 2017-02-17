@@ -1,0 +1,512 @@
+{% extends "admin.html" %}
+{% set snactive = "sites" %}
+
+{% block title %}IMan Administration - Sites{% endblock %}
+
+{% block content %}
+<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+  <li class="active">
+    <a data-toggle="tab" href="#centers">
+      <i class="fa fa-fw fa-building"></i>
+      Centers
+    </a>
+  </li>
+  <li>
+    <a data-toggle="tab" href="#sites">
+      <i class="fa fa-fw fa-globe"></i>
+      Sites
+    </a>
+  </li>
+</ul>
+<div class="tab-content">
+  <div id="centers" class="tab-pane fade in active">
+    <div id="toolbar-center">
+      <a id="center-new" class="btn btn-primary">
+	<i class="fa fa-fw fa-plus"></i>
+      </a>
+    </div>
+    <table id="table-centers" data-show-toggle="false"
+	   data-show-export="true" data-show-columns="true"
+	   data-show-multi-sort="true" data-sort-name="site"
+	   data-toggle="table" data-search="true"
+	   data-toolbar="#toolbar-center"
+	   data-pagination="true" data-show-footer="false"
+	   data-page-size="50" data-escape="false"
+	   class="table table-hover table-striped table-compact
+		  table-condensed table-autosize">
+      <thead>
+	<tr>
+	  <th data-sortable="true" data-halign="left"
+	      data-valign="middle" data-field="id"
+	      data-visible="false">
+	    <i class="fa fa-fw fa-key" aria-hidden="true"></i>
+	    ID
+	  </th>
+	  <th data-sortable="true" data-align="left"
+	      data-align="left" data-valign="middle"
+	      data-field="name">
+	    <i class="fa fa-fw fa-sort-amount-desc"
+	       aria-hidden="true"></i>
+	    Name
+	  </th>
+	  <th data-sortable="true" data-align="left"
+	      data-align="left" data-valign="middle"
+	      data-field="site">
+	    <i class="fa fa-fw fa-globe" aria-hidden="true"></i>
+	    Site
+	  </th>
+	  <th data-sortable="true" data-halign="left"
+	      data-align="left" data-valign="middle"
+	      data-field="owner">
+	    <i class="fa fa-fw fa-user" aria-hidden="true"></i>
+	    Owner
+	  </th>
+	  <th data-halign="center" data-valign="middle"
+	      data-align="center">
+	    <i class="fa fa-fw fa-cogs" aria-hidden="true"></i>
+	    Actions
+	  </th>
+      </thead>
+      <tbody>
+	{% for center in data('Center') %}
+	<tr id="center-{{ center.id }}">
+	  <td>{{ center.id }}</td>
+	  <td>{{ center.name }}</td>
+	  <td>{{ center.site.name }}</td>
+	  <td>
+	    <img class="img-circle fa-fw"
+		 src="{{ center.owner.avatar }}" alt=""/>
+	    {{ center.owner.displayname }}
+	  </td>
+	  <td>
+	    <a class="center-open" data-id="{{ center.id }}">
+	      <i class="fa fa-fw fa-pencil" aria-hidden="true">
+	      </i>
+	    </a>
+	    <a class="center-delete" data-id="{{ center.id }}"
+	       data-name="{{ center.name }}">
+	      <i class="fa fa-fw fa-trash" aria-hidden="true">
+	      </i>
+	    </a>
+	  </td>
+	</tr>
+	{% endfor %}      
+      </tbody>
+    </table>
+  </div>
+  <div id="sites" class="tab-pane fade in">
+    <div id="toolbar-site">
+      <a id="new-site" href="#" class="btn btn-primary"
+	 data-toggle="modal" data-target="#ModalSite">
+	<i class="fa fa-fw fa-plus"></i>
+      </a>
+    </div>
+    <table id="table-sites" data-show-toggle="false"
+	   data-show-export="true" data-show-columns="true"
+	   data-show-multi-sort="true" data-sort-name="display"
+	   data-toggle="table" data-search="true"
+	   data-toolbar="#toolbar-site" data-pagination="true"
+	   data-show-footer="false" data-page-size="50"
+	   data-escape="false"
+	   class="table table-hover table-striped table-compact 
+		  table-condensed table-autosize">
+      <thead>
+	<tr>
+	  <th data-sortable="true" data-halign="left"
+	      data-valign="middle" data-field="id"
+	      data-visible="false">
+	    <i class="fa fa-fw fa-key" aria-hidden="true"></i>
+	    ID
+	  </th>
+	  <th data-sortable="true" data-halign="left"
+	      data-valign="middle" data-field="name">
+	    <i class="fa fa-fw fa-sort-amount-desc"
+	       aria-hidden="true"></i>
+	    Name
+	  </th>
+	  <th data-sortable="false" data-halign="center"
+	      data-align="center" data-valign="middle">
+	    <i class="fa fa-fw fa-building"
+	       aria-hidden="true"></i>
+	    Centers
+	  </th>
+	  <th data-halign="center" data-valign="middle"
+	      data-align="center">
+	    <i class="fa fa-fw fa-cogs" aria-hidden="true"></i>
+	    Actions
+	  </th>
+      </thead>
+      <tbody>
+	{% for site in data('Site') %}
+	<tr id="site-{{ site.id }}">
+	  <td>{{ site.id }}</td>
+	  <td>{{ site.name }}</td>
+	  <td>{{ site.centers.count() }}</td>
+	  <td>
+	    <a class="site-open" data-id="{{ site.id }}">
+	      <i class="fa fa-fw fa-pencil" aria-hidden="true">
+	      </i>
+	    </a>
+	    <a class="site-delete" data-id="{{ site.id }}"
+	       data-name="{{ site.name }}">
+	      <i class="fa fa-fw fa-trash" aria-hidden="true">
+	      </i>
+	    </a>	    
+	  </td>
+	</tr>
+	{% endfor %}      
+      </tbody>
+    </table>
+  </div>
+</div>
+<div id="ModalCenter" class="modal fade" tabindex="-1"
+     role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-content">
+    <div class="modal-header"
+	 style="background-color: #337ab7; color: #fff;">
+      <button type="button" class="close" data-dismiss="modal"
+	      aria-hidden="true">
+	&times;
+      </button>
+      <h4 class="modal-title">Center</h4>
+    </div>
+    <div class="modal-body">
+      <form id="modal-form-center" role="form" method="POST"
+	    style="padding: 1% 0%;">
+	<fieldset id="fieldset">
+	  <input class="col-md-8 form-control-static hidden"
+		 id="cid">
+	  <div class="row">
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="name">
+		Name
+	      </label>
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-key"
+		     aria-hidden="true"></i>
+		</span>
+		<input type="text" class="form-control"
+		       id="name" name="name"
+		       type="text" value="" required>
+	      </div>
+	    </div>
+	    <div class="col-md-6 form-group">
+	      <label for="site">Site</label>
+	      <div class="input-group">
+		<select id="site" data-container="body"
+			class="selectpicker form-control"
+			name="site" data-live-search="true">
+		</select>
+	      </div>
+	    </div>
+	  </div>
+	  <div class="row">
+	    <div class="col-md-6 form-group">
+	      <label for="owner">Owner</label>
+	      <div class="input-group">
+		<select id="owner" data-container="body"
+			class="selectpicker form-control"
+			name="owner" data-live-search="true">
+		</select>
+	      </div>
+	    </div>
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="mobile">
+		Mobile
+	      </label>
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-mobile"
+		     aria-hidden="true"></i>
+		</span>	      
+		<input class="form-control"
+		       id="mobile" name="mobile">
+	      </div>
+	    </div>
+	  </div>
+	</fieldset>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div class="pull-right">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">
+	  Close
+	</button>
+	<button type="button" class="btn btn-primary"
+		id="center-save">
+	  Save
+	</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="ModalSite" class="modal fade" tabindex="-1"
+     role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-content">
+    <div class="modal-header"
+	 style="background-color: #337ab7; color: #fff;">
+      <button type="button" class="close" data-dismiss="modal"
+	      aria-hidden="true">
+	&times;
+      </button>
+      <h4 class="modal-title">Site</h4>
+    </div>
+    <div class="modal-body">
+      <form id="modal-form-site" role="form" method="POST"
+	    style="padding: 1% 0%;">
+	<fieldset id="fieldset">
+	  <input class="col-md-8 form-control-static hidden"
+		 id="sid">
+	  <div class="row">
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="name">
+		Name
+	      </label>
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-key"
+		     aria-hidden="true"></i>
+		</span>
+		<input type="text" class="form-control"
+		       id="name" name="name"
+		       type="text" value="" required>
+	      </div>
+	    </div>
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="country">
+		Country
+	      </label>
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-flag"
+		     aria-hidden="true"></i>
+		</span>	      
+		<input class="form-control"
+		       id="country" name="country" disabled>
+	      </div>
+	    </div>
+	  </div>
+	  <div class="row">
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="state">
+		State
+	      </label>
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-globe"
+		     aria-hidden="true"></i>
+		</span>	      
+		<input class="form-control"
+		       id="state" name="state" disabled>
+	      </div>
+	    </div>
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="city">
+		City
+	      </label>
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-university"
+		     aria-hidden="true"></i>
+		</span>	      
+		<input class="form-control"
+		       id="city" name="city" disabled>
+	      </div>
+	    </div>
+	  </div>
+	</fieldset>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div class="pull-right">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">
+	  Close
+	</button>
+	<button type="button" class="btn btn-primary"
+		id="site-save">
+	  Save
+	</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link href="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.css" rel="stylesheet">
+<script src="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.js"></script>
+<link href="//cdn.corpam.com.ar/bootstrap-select/stable/css/bootstrap-select.min.css" rel="stylesheet">
+<script src="//cdn.corpam.com.ar/bootstrap-select/stable/js/bootstrap-select.min.js"></script>
+<script src="//cdn.corpam.com.ar/bootbox/stable/js/bootbox.min.js"></script>
+<script>
+    $(document).ready(function () {
+	autosize_tables();
+	$(window).resize(function () {
+	    autosize_tables();
+	});
+	$('.modal').on('hidden.bs.modal', function(){
+	    $('.modal').find('.modal-title').html('New');
+	    var forms = $(this).find('form');
+	    forms.each(function(row){
+		forms[row].reset();
+	    });
+	    var selectpickers = $(this).find('.selectpicker');
+	    selectpickers.each(function(row){
+		$(selectpickers[row]).selectpicker('refresh');
+	    });
+	});
+	jqlisteners();
+    });
+function LoadFormCenter() {
+    var modal = "#ModalCenter";
+    var sites = $(modal).find("#site");
+    var owner = $(modal).find("#owner");
+    $.ajax({
+	async: false,
+	url: "{{ url_for('api_sites') }}",
+	type: "GET",
+	success: function(e) {
+	    var data = e["data"];
+	    $(sites).html("");
+	    for (row in data) {
+		html = '<option value="'+data[row]['id'];
+		html+= '">' + data[row]['name'];
+		    html+= '</option>';
+		$(sites).append(html);
+	    }
+	    $(sites).selectpicker('refresh');
+	}
+    });
+    $.ajax({
+	async: false,
+	url: "{{ url_for('api_users') }}?order_by=displayname",
+	type: "GET",
+	success: function(e) {
+	    var data = e["data"];
+	    $(owner).html("");
+	    for (row in data) {
+		html = '<option value="'+data[row]['id'];
+		html+= '" data-content="<img class=\'';
+		html+= 'img-circle fa fa-fw\' src=\'';
+		html+= data[row]['avatar'] + '\'/> ';
+		html+= data[row]['displayname'];
+		html+= '" data-tokens="';
+		html+= data[row]['displayname'] + '">';
+		html+= data[row]['displayname'];
+		html+= '</option>';
+		$(owner).append(html);
+	    }
+	    $(owner).selectpicker('refresh');
+	}
+    });
+};
+function jqlisteners() {
+    $("#center-new").unbind("click");
+    $("#center-new").click(function(e) {
+	e.preventDefault();
+	var modal = "#ModalCenter";
+	LoadFormCenter();
+	$(modal).modal("show");
+    });
+    $(".center-open").unbind("click");
+    $(".center-open").click(function(e) {
+	e.preventDefault();
+	var modal = "#ModalCenter";
+	var cid = $(this).data("id");
+	LoadFormCenter();
+	$.ajax({
+	    async: true,
+	    url: "{{ url_for('api_centers') }}?id=" + cid,
+	    type: "GET",
+	    success: function(e) {
+		var data = e["data"][0];
+		$(modal).find("#cid").val(data["id"]);
+		$(modal).find("#name").val(data["name"]);
+		$(modal).find("#owner").val(data["owner"]);
+		$(modal).find("#owner").selectpicker("refresh");
+		$(modal).find("#site").val(data["site"]);
+		$(modal).find("#site").selectpicker("refresh");
+		$(modal).modal("show");
+	    }
+	});
+    });
+    $("#center-save").unbind("click");
+    $("#center-save").click(function(e) {
+	e.preventDefault();
+	var modal = "#ModalCenter";
+	var form = "#modal-form-center";
+	var cid = $(form).find("#cid").val();
+	var data = {
+	    'name': $(form).find("#name").val(),
+	    'site': $(form).find("#site").val(),
+	    'owner': $(form).find("#owner").val(),
+	};
+	if ( typeof cid === undefined || cid === '' ) {
+	    var url = "{{ url_for('api_centers') }}";
+	} else {
+	    var url = "{{ url_for('api_centers') }}?id=" + cid;
+	};
+	$.ajax({
+	    async: true,
+	    url: url,
+	    type: "POST",
+	    data: JSON.stringify(data),
+	    contentType: "application/json",
+	    success: function(e) {
+		$(modal).modal('hide');
+	    }
+	});
+    });
+    $("#site-save").unbind("click");
+    $("#site-save").click(function(e) {
+	e.preventDefault();
+	var modal = "#ModalSite";
+	var form = "#modal-form-site";
+	var sid = $(form).find("#sid").val();
+	var data = {
+	    'name': $(form).find("#name").val(),
+	};
+	if ( typeof sid === undefined || sid === '' ) {
+	    var url = "{{ url_for('api_sites') }}";
+	} else {
+	    var url = "{{ url_for('api_sites') }}?id=" + sid;
+	};
+	$.ajax({
+	    async: true,
+	    url: url,
+	    type: "POST",
+	    data: JSON.stringify(data),
+	    contentType: "application/json",
+	    success: function(e) {
+		$(modal).modal('hide');
+	    }
+	});
+    });
+};
+function autosize_tables() {
+    var tables = $('body').find(".table-autosize");
+    tables.each(function(row){
+	var selector = $(tables[row]).attr('id');
+	selector = '#' + selector;
+	$(selector).on('post-body.bs.table', function () {
+	    jqlisteners();
+	});
+	$(selector).bootstrapTable({
+	    height: table_height(selector),
+	});
+	$(selector).bootstrapTable('resetView', {
+	    height: table_height(selector),
+	});	    
+    });
+}
+function table_height(table) {
+    var parent = $(table).parent().parent().parent().parent();
+    return parent.height();
+};    
+</script>
+{% endblock %}

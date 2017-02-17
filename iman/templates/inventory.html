@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% set highlighted = "inventory" %}
+
+{% block title %}IMan - Inventory{% endblock %}
+
+{% block body %}
+<div id="items">
+  <div id="toolbar">
+    {% if session.user.admin %}
+    <a id="new" href="{{ url_for('items', serial='new') }}"
+       class="btn btn-primary">
+      <i class="fa fa-fw fa-plus"></i>
+    </a>
+    {% endif %}
+  </div>
+  <table id="table" data-show-toggle="true"
+	 data-show-export="true" data-show-columns="true"
+	 data-show-multi-sort="true" data-sort-name="site"
+	 data-toggle="table" data-search="true"
+	 data-toolbar="#toolbar" data-row-style="rowStyle"
+	 data-show-export="true" data-pagination="true"
+	 data-show-footer="false" data-page-size="50"
+	 data-escape="false"
+	 class="table table-hover table-striped table-compact
+		table-condensed">
+    <thead>
+      <tr>
+	<th data-align="center" data-valign="middle"
+	    data-field="status" data-sortable="true"
+	    data-visible="false" data-checkbox="true">
+	  <i class="fa fa-fw fa-question"></i>
+	  Status
+	</th>    
+	<th data-halign="center" data-valign="middle"
+	    data-align="center" data-field="serial">
+	  Serial</th>
+	<th data-halign="center" data-sortable="true"
+	    data-valign="middle" data-align="center"
+	    data-visible="false">
+	  Product
+	</th>
+	<th data-halign="center" data-valign="middle"
+	    data-align="left">
+	  Model
+	</th>
+	<th data-halign="center" data-sortable="true"
+	    data-valign="middle" data-align="center"
+	    data-field="vendor">
+	  Vendor
+	</th>
+	<th data-halign="center" data-sortable="true"
+	    data-valign="middle" data-align="center"
+	    data-field="center">
+	  Datacenter
+	</th>
+	<th data-halign="center" data-sortable="true"
+	    data-valign="middle" data-align="center"
+	    data-field="site">
+	  Site
+	</th>
+	<th data-halign="center" data-sortable="true"
+	    data-valign="middle" data-align="center"
+	    data-field="expire">
+	  Expiration
+	</th>
+	<th data-visible="false">
+	  Notes
+	</th>
+	<th data-halign="center" data-valign="middle"
+	    data-align="center">
+	  Actions
+	</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in data('Item') %}
+      <tr>
+	<td>{{ item.status }}</td>
+	<td>{{ item.serial }}</td>
+	<td>{{ item.product.serial }}</td>
+	<td>{{ item.product.model }}</td>
+	<td>{{ item.product.vendor.name if item.product.vendor != None }}</td>
+	<td>{{ item.center.name if item.center != None }}</td>
+	<td>{{ item.center.site.name if item.center != None }}</td>
+	<td>{{ dformat(item.expiration()) if item.agreements else '-' }}</td>
+	<td>{{ item.notes }}</td>
+	<td>
+	  {% if session.user.admin %}
+	  <a href="{{ url_for('items', serial=item.serial) }}">
+	    <i class="fa fa-pencil fa-fw"></i>
+	  </a>
+	  <a class="item-del" data-id="{{ item.serial }}"
+	     href="#">
+	    <i class="fa fa-trash fa-fw"></i>
+	  </a>
+	  {% endif %}
+	  <a href="{{ item.url() if item.url() != None else url_for('items', serial=item.serial)}}" target="_blank"><i class="fa fa-external-link fa-fw"></i></a>
+	</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div id="ModalDel" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-vcenter">
+    <div class="modal-dialog">
+      <div class="modal-content">
+	<div class="modal-header"
+	     style="background-color: #337ab7; color: #fff;">
+	  <button type="button" class="close"
+		  data-dismiss="modal" aria-hidden="true">
+	    &times;
+	  </button>
+	  <h4 class="modal-title">Item</h4>
+	</div>
+	<div class="modal-body">
+	  <form id="modal-form" role="form" method="POST"
+		style="padding: 1% 0%;">
+	    <div class="form-group">
+	      <p>Are you sure do you want to delete this item <strong id="item-id"></strong> ?</p>
+	    </div>
+	  </form>
+	</div>
+	<div class="modal-footer">
+	  <div class="pull-right">
+	    <button type="button" class="btn btn-default"
+		    data-dismiss="modal">
+	      Close
+	    </button>
+	    <button type="button" class="btn btn-danger"
+		    id="btn-delete">
+	      Delete
+	    </button>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link href="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.css" rel="stylesheet">
+<script src="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.js"></script>
+<script src="//cdn.corpam.com.ar/bootstrap-table/stable/extensions/export/bootstrap-table-export.js"></script>
+<script src="//cdn.corpam.com.ar/tableExport/stable/tableExport.min.js"></script>
+<script>
+    $(function () {
+	var ITEM = null;
+	$("#table").bootstrapTable({
+	    height: table_height(),
+	    exportTypes: ['json', 'csv', 'txt', 'excel']
+	});
+	$("#table").bootstrapTable('resetView', {
+	    height: table_height()
+	});
+	$(window).resize(function () {
+	    $("#table").bootstrapTable('resetView', {
+		height: table_height()
+	    });
+	});
+	$(".item-del").click(function() {
+	    ITEM = $(this).data('id');
+	    $("#item-id").html(ITEM);
+	    $('#ModalDel').modal('show');
+	});
+	$("#btn-delete").click(function() {
+	    var url = "{{ url_for('api', obj='Item') }}?serial=" + ITEM;
+	    $.ajax({
+  		async: false,
+  		url: url,
+  		type: 'DELETE',
+  		success: function(result) {
+  		    $("#table").bootstrapTable('remove',
+					       {field:'serial', values:[ITEM.toString()]} );
+  		    $('#ModalDel').modal('hide');
+  		}
+  	    });
+	});
+    });
+function table_height() {
+    return $("#items").height() * 0.99;
+};
+function rowStyle(row, index) {
+    if ( row['status'] == 'False' ) {
+    	return {
+    	    css: {"text-decoration": "line-through"}
+    	};
+    } else {
+	return {
+	    css: {"text-decoration": "none"}
+	};
+    }
+};
+</script>
+{% endblock %}

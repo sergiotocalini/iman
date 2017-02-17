@@ -1,0 +1,535 @@
+{% extends "admin.html" %}
+{% block title %}IMan Administration - Vendors{% endblock %}
+
+{% block content %}
+<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+  <li class="active">
+    <a data-toggle="tab" href="#products">
+      <i class="fa fa-fw fa-list-alt" aria-hidden="true"></i>
+      Products
+    </a>
+  </li>
+  <li>
+    <a data-toggle="tab" href="#vendors">
+      <i class="fa fa-fw fa-shopping-cart" aria-hidden="true"></i>
+      Vendors
+    </a>
+  </li>
+</ul>
+<div class="tab-content">
+  <div id="products" class="tab-pane fade in active">
+    <div id="toolbar-product">
+      <a class="btn btn-primary" href="#"
+	 data-toggle="modal" data-target="#ModalProduct">
+	<i class="fa fa-fw fa-plus" aria-hidden="true"></i>
+      </a>
+    </div>
+    <table id="table-product" data-show-toggle="false"
+	   data-show-export="true" data-show-columns="true"
+	   data-show-multi-sort="true" data-sort-name="display"
+	   data-toggle="table" data-search="true"
+	   data-toolbar="#toolbar-product" data-escape="false"
+	   data-pagination="true"
+	   data-show-footer="false" data-page-size="50"
+	   class="table table-hover table-striped table-compact
+		  table-condensed table-autosize">
+      <thead>
+	<tr>
+	  <th data-halign="left" data-valign="middle"
+	      data-field="id" data-visible="false">
+	    ID
+	  </th>
+	  <th data-sortable="true" data-halign="center"
+	      data-align="center" data-valign="middle"
+	      data-field="serial">
+	    Serial
+	  </th>
+	  <th data-sortable="false" data-halign="center"
+	      data-valign="middle">
+	    Model
+	  </th>
+	  <th data-sortable="false" data-halign="center"
+	      data-align="center" data-valign="middle">
+	    Vendor
+	  </th>
+	  <th data-halign="center" data-valign="middle"
+	      data-align="center">
+	    Actions
+	  </th>
+	</tr>
+      </thead>
+      <tbody>
+	{% for product in data('Product') %}
+	<tr id="product-{{ product.id }}">
+	  <td>{{ product.id }}</td>
+	  <td>{{ product.serial }}</td>
+	  <td>{{ product.model }}</td>
+	  <td>{{ product.vendor.name }}</td>
+	  <td>
+	    <a class="product-open" data-id="{{ product.id }}">
+	      <i class="fa fa-fw fa-pencil" aria-hidden="true">
+	      </i>
+	    </a>
+	    <a class="product-delete" data-id="{{ product.id }}"
+	       data-name="{{ product.serial }}">
+	      <i class="fa fa-fw fa-trash" aria-hidden="true">
+	      </i>
+	    </a>
+	  </td>
+	</tr>
+	{% endfor %}      
+      </tbody>
+    </table>
+  </div>
+  <div id="vendors" class="tab-pane fade in">
+    <div id="toolbar-vendor">
+      <a id="new-vendor" href="#" class="btn btn-primary"
+	 data-toggle="modal" data-target="#ModalVendor">
+	<i class="fa fa-fw fa-plus" aria-hidden="true"></i>
+      </a>
+    </div>
+    <table id="table-vendor" data-show-toggle="false"
+	   data-show-export="true" data-show-columns="true"
+	   data-show-multi-sort="true" data-sort-name="display"
+	   data-toggle="table" data-search="true"
+	   data-toolbar="#toolbar-vendor" data-pagination="true"
+	   data-show-footer="false" data-page-size="50"
+	   data-escape="false"
+	   class="table table-hover table-striped table-compact 
+		  table-condensed table-autosize">
+      <thead>
+	<tr>
+	  <th data-halign="left" data-valign="middle"
+	      data-field="id" data-visible="false">
+	    ID
+	  </th>
+	  <th data-sortable="true" data-halign="center"
+	      data-align="center" data-valign="middle"
+	      data-field="name">
+	    Name
+	  </th>
+	  <th data-sortable="false" data-halign="center"
+	      data-align="center" data-valign="middle">
+	    Products
+	  </th>	  
+	  <th data-visible="false" data-field="notes">
+	    Comments
+	  </th>
+	  <th data-halign="center" data-valign="middle"
+	      data-align="center">
+	    Actions
+	  </th>
+	</tr>
+      </thead>
+      <tbody>
+	{% for vendor in data('Vendor') %}
+	<tr id="vendor-{{ vendor.id }}">
+	  <td>{{ vendor.id }}</td>
+	  <td>{{ vendor.name }}</td>
+	  <td>{{ vendor.products.count() }}</td>
+	  <td>{{ vendor.comments }}</td>
+	  <td>
+	    <a class="vendor-open" data-id="{{ vendor.id }}">
+	      <i class="fa fa-fw fa-pencil" aria-hidden="true">
+	      </i>
+	    </a>
+	    <a class="vendor-delete" data-id="{{ vendor.id }}"
+	       data-name="{{ vendor.name }}">
+	      <i class="fa fa-fw fa-trash" aria-hidden="true">
+	      </i>
+	    </a>	    
+	  </td>
+	</tr>
+	{% endfor %}      
+      </tbody>
+    </table>
+  </div>
+</div>
+<div id="ModalProduct" class="modal fade" tabindex="-1"
+     role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-content">
+    <div class="modal-header"
+	 style="background-color: #337ab7; color: #fff;">
+      <button type="button" class="close" data-dismiss="modal"
+	      aria-hidden="true">
+	&times;
+      </button>
+      <h4 class="modal-title">Product</h4>
+    </div>
+    <div class="modal-body">
+      <form id="modal-form-product" role="form" method="POST"
+	    style="padding: 1% 0%;">
+	<fieldset id="fieldset">
+	  <input class="form-control-static hidden" id="pid">
+	  <div class="row">
+	    <div class="col-md-6 form-group">
+	      <label for="serial">Serial</label>
+	      <div class="input-group">
+		<input type="text" class="form-control"
+		       id="serial" name="serial"
+		       placeholder="Serial" required
+		       type="text" value="">
+	      </div>
+	    </div>
+	    <div class="col-md-6 form-group">
+	      <label for="vendor">Vendor</label>
+	      <div class="input-group">
+		<select id="vendor" data-container="body"
+			class="selectpicker form-control"
+			name="vendor" data-live-search="true">
+		  {% for vendor in data('Vendor') %}
+		  <option value="{{ vendor.id }}"
+			  title="{{ vendor.name }}"
+			  data-tokens="{{ vendor.name }}">
+		    {{ vendor.name }}
+		  </option>
+		  {% endfor %}
+		</select>
+	      </div>
+	    </div>
+	  </div>
+	  <div class="row">
+	    <div class="col-md-6 form-group">
+	      <label for="model">Model</label>
+	      <div class="input-group">
+		<input type="text" class="form-control" id="model"
+		       name="model" placeholder="Model" required
+		       type="text" value="">
+	      </div>
+	    </div>
+	    <div class="col-md-6 form-group">
+	      <label for="model">Categories</label>
+	      <div class="input-group">
+		<select id="category" data-container="body"
+			class="selectpicker form-control"
+			name="vendor" data-live-search="true">
+		  {% for category in data('Category') %}
+		  <option value="{{ category.id }}"
+			  title="{{ category.name }}"
+			  data-tokens="{{ category.name }}">
+		    {{ category.name }}
+		  </option>
+		  {% endfor %}
+		</select>
+	      </div>
+	    </div>	    
+	  </div>
+	  <div class="row">
+	    <div class="col-md-6 form-group">
+	      <label for="management">Management</label>
+	      <div class="input-group">
+		<input type="text" class="form-control"
+		       id="mngt" name="mngt" type="text" required
+		       value="https://{serial}.ilo.{site}.{country}.internal/">
+	      </div>
+	    </div>
+	  </div>
+	</fieldset>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div class="pull-right">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">
+	  Close
+	</button>
+	<button type="button" class="btn btn-primary"
+		id="product-save">
+	  Save
+	</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="ModalVendor" class="modal fade" tabindex="-1"
+     role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-content">
+    <div class="modal-header"
+	 style="background-color: #337ab7; color: #fff;">
+      <button type="button" class="close" data-dismiss="modal"
+	      aria-hidden="true">
+	&times;
+      </button>
+      <h4 class="modal-title">Vendor</h4>
+    </div>
+    <div class="modal-body">
+      <form id="modal-form-vendor" role="form" method="POST"
+	    style="padding: 1% 0%;">
+	<fieldset id="fieldset">
+	  <input class="col-md-8 form-control-static hidden"
+		 id="vid">
+	  <div class="row">
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="name">
+		Name
+	      </label>
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-key"
+		     aria-hidden="true"></i>
+		</span>
+		<input type="text" class="form-control"
+		       id="name" name="name"
+		       type="text" value="" required>
+	      </div>
+	    </div>
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="email">
+		Email
+	      </label>
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-envelope"
+		     aria-hidden="true"></i>
+		</span>	      
+		<input class="form-control"
+		       id="email" name="email">
+	      </div>
+	    </div>
+	  </div>
+	  <div class="row">
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="phone">
+		Telephone
+	      </label>
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-phone"
+		     aria-hidden="true"></i>
+		</span>	      
+		<input class="form-control"
+		       id="phone" name="phone">
+	      </div>
+	    </div>
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="mobile">
+		Mobile
+	      </label>
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-mobile"
+		     aria-hidden="true"></i>
+		</span>	      
+		<input class="form-control"
+		       id="mobile" name="mobile">
+	      </div>
+	    </div>
+	  </div>
+	</fieldset>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div class="pull-right">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">
+	  Close
+	</button>
+	<button type="button" class="btn btn-primary"
+		id="vendor-save">
+	  Save
+	</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link href="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.css" rel="stylesheet">
+<script src="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.js"></script>
+<link href="//cdn.corpam.com.ar/bootstrap-select/stable/css/bootstrap-select.min.css" rel="stylesheet">
+<script src="//cdn.corpam.com.ar/bootstrap-select/stable/js/bootstrap-select.min.js"></script>
+<script src="//cdn.corpam.com.ar/bootbox/stable/js/bootbox.min.js"></script>
+<script>
+    $(document).ready(function () {
+	autosize_tables();
+	$(window).resize(function () {
+	    autosize_tables();
+	});
+	$('.modal').on('hidden.bs.modal', function(){
+	    $('.modal').find('.modal-title').html('New');
+	    var forms = $(this).find('form');
+	    forms.each(function(row){
+		forms[row].reset();
+	    });
+	    var selectpickers = $(this).find('.selectpicker');
+	    selectpickers.each(function(row){
+		$(selectpickers[row]).selectpicker('refresh');
+	    });
+	});
+	jqlisteners();
+    });
+function jqlisteners() {
+    $(".product-open").unbind("click");
+    $(".product-open").click(function(e) {
+	e.preventDefault();
+	var modal = "#ModalProduct";
+	var pid = $(this).data("id");
+	$.ajax({
+	    async: true,
+	    url: "{{ url_for('api_products') }}?id=" + pid,
+	    type: "GET",
+	    success: function(e) {
+		var data = e["data"][0];
+		$(modal).find("#pid").val(data["id"]);
+		$(modal).find("#vendor").val(data["vendor"]);
+		$(modal).find("#vendor").selectpicker("refresh");
+		$(modal).find("#serial").val(data["serial"]);
+		$(modal).find("#model").val(data["model"]);
+		$(modal).find("#mngt").val(data["management"]);
+		$(modal).modal("show");
+	    }
+	});
+    });    
+    $("#product-save").unbind("click");
+    $("#product-save").click(function(e) {
+	e.preventDefault();
+	var modal = "#ModalProduct";
+	var form = "#modal-form-product";
+	var pid = $(form).find("#pid").val();
+	var data = {
+	    'serial': $(form).find("#serial").val(),
+	    'management': $(form).find("#mngt").val(),
+	    'model': $(form).find("#model").val(),
+	    'vendor': $(form).find("#vendor").val(),
+	    'categories': $(form).find("#categories").val(),
+	};
+	if ( typeof pid === undefined || pid === '' ) {
+	    var url = "{{ url_for('api_products') }}";
+	} else {
+	    var url = "{{ url_for('api_products') }}?id=" + pid;
+	};
+	$.ajax({
+	    async: true,
+	    url: url,
+	    type: "POST",
+	    data: JSON.stringify(data),
+	    contentType: "application/json",
+	    success: function(e) {
+		$(modal).modal('hide');
+	    }
+	});
+    });
+    $(".product-delete").unbind("click");
+    $(".product-delete").click(function(event){
+	event.preventDefault();
+	var vid = $(this).data('id');
+	var name = $(this).data('name');
+	var url = "{{ url_for('api_products') }}?id=" + vid;
+	var msg = 'Are you sure you want to delete this product';
+	msg += '<strong> ' + name + ' </strong> ?';
+	bootbox.confirm({
+	    className: 'modal-confirm',
+	    message: msg,
+	    callback: function(result) {
+		if ( result === true ) {
+		    $.ajax({
+			url: url,
+			type: 'DELETE',
+			success: function(e) {
+			    $('#product-' + vid).hide();
+			    $(modal).modal('hide');
+			}
+		    });
+		};
+	    }
+	});
+    });
+    $(".vendor-open").unbind("click");
+    $(".vendor-open").click(function(e) {
+	e.preventDefault();
+	var modal = "#ModalVendor";
+	var vid = $(this).data("id");
+	$.ajax({
+	    async: true,
+	    url: "{{ url_for('api_vendors') }}?id=" + vid,
+	    type: "GET",
+	    success: function(e) {
+		var data = e["data"][0];
+		$(modal).find("#vid").val(data["id"]);
+		$(modal).find("#name").val(data["name"]);
+		$(modal).find("#email").val(data["email"]);
+		$(modal).find("#phone").val(data["telephone"]);
+		$(modal).find("#mobile").val(data["mobile"]);
+		$(modal).modal("show");
+	    }
+	});
+    });
+    $("#vendor-save").unbind("click");
+    $("#vendor-save").click(function(e) {
+	e.preventDefault();
+	var modal = "#ModalVendor";
+	var form = "#modal-form-vendor";
+	var vid = $(form).find("#vid").val();
+	var data = {
+	    'name': $(form).find("#name").val(),
+	    'email': $(form).find("#email").val(),
+	    'telephone': $(form).find("#phone").val(),
+	    'mobile': $(form).find("#mobile").val(),
+	};
+	if ( typeof vid === undefined || vid === '' ) {
+	    var url = "{{ url_for('api_vendors') }}";
+	} else {
+	    var url = "{{ url_for('api_vendors') }}?id=" + vid;
+	};
+	$.ajax({
+	    async: true,
+	    url: url,
+	    type: "POST",
+	    data: JSON.stringify(data),
+	    contentType: "application/json",
+	    success: function(e) {
+		$(modal).modal('hide');
+	    }
+	});
+    });
+    $(".vendor-delete").unbind("click");
+    $(".vendor-delete").click(function(event){
+	event.preventDefault();
+	var vid = $(this).data('id');
+	var name = $(this).data('name');
+	var url = "{{ url_for('api_vendors') }}?id=" + vid;
+	var msg = 'Are you sure you want to delete this vendor';
+	msg += '<strong> ' + name + ' </strong> ?';
+	bootbox.confirm({
+	    className: 'modal-confirm',
+	    message: msg,
+	    callback: function(result) {
+		if ( result === true ) {
+		    $.ajax({
+			url: url,
+			type: 'DELETE',
+			success: function(e) {
+			    $('#vendor-' + vid).hide();
+			    $(modal).modal('hide');
+			}
+		    });
+		};
+	    }
+	});
+    });
+};
+function autosize_tables() {
+    var tables = $('body').find(".table-autosize");
+    tables.each(function(row){
+	var selector = $(tables[row]).attr('id');
+	selector = '#' + selector;
+	$(selector).on('post-body.bs.table', function () {
+	    jqlisteners();
+	});
+	$(selector).bootstrapTable({
+	    height: table_height(selector),
+	});
+	$(selector).bootstrapTable('resetView', {
+	    height: table_height(selector),
+	});	    
+    });
+}
+function table_height(table) {
+    var parent = $(table).parent().parent().parent().parent();
+    return parent.height();
+};
+</script>
+{% endblock %}
